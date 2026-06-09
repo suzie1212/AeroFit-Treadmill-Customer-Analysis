@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.6">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Aerofit Customer Analytics Dashboard&lt;/title&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.plot.ly/plotly-2.35.2.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"&gt;&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: Arial, sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background:#f5f7fa;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin:20px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>h1{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-align:center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color:#2c3e50;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.kpi-container{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display:flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>gap:20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>justify-content:center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>flex-wrap:wrap;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.kpi{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background:white;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding:20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius:10px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width:220px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-align:center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow:0 2px 8px rgba(0,0,0,0.1);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.kpi h2{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin:0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color:#3498db;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.chart{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-top:40px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>#filters{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display:flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>gap:20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>justify-content:center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom:20px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>select{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding:8px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;h1&gt;🏃 Aerofit Customer Analytics Dashboard&lt;/h1&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;div id="filters"&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;select id="productFilter"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;option value="All"&gt;All Products&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/select&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;select id="genderFilter"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;option value="All"&gt;All Genders&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/select&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;div class="kpi-container"&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="kpi"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h3&gt;Total Customers&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 id="customers"&gt;&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="kpi"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h3&gt;Avg Income&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 id="income"&gt;&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="kpi"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h3&gt;Avg Miles&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 id="miles"&gt;&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="kpi"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h3&gt;Avg Fitness&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 id="fitness"&gt;&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;div id="pie" class="chart"&gt;&lt;/div&gt;</p>
+<p class="p1">&lt;div id="age" class="chart"&gt;&lt;/div&gt;</p>
+<p class="p1">&lt;div id="scatter" class="chart"&gt;&lt;/div&gt;</p>
+<p class="p1">&lt;div id="box" class="chart"&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">Papa.parse("aerofit_treadmill.csv",{</p>
+<p class="p1"><span class="Apple-converted-space">    </span>download:true,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>header:true,</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>complete:function(results){</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>let data = results.data;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>populateFilters(data);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById("productFilter")</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.addEventListener("change",()=&gt;updateDashboard(data));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById("genderFilter")</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.addEventListener("change",()=&gt;updateDashboard(data));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>updateDashboard(data);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1">});</p>
+<p class="p2"><br></p>
+<p class="p1">function populateFilters(data){</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let products=[...new Set(data.map(x=&gt;x.Product))];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let genders=[...new Set(data.map(x=&gt;x.Gender))];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>products.forEach(p=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>productFilter.innerHTML+=</p>
+<p class="p1"><span class="Apple-converted-space">        </span>`&lt;option value="${p}"&gt;${p}&lt;/option&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>genders.forEach(g=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>genderFilter.innerHTML+=</p>
+<p class="p1"><span class="Apple-converted-space">        </span>`&lt;option value="${g}"&gt;${g}&lt;/option&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function updateDashboard(data){</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let product=document.getElementById("productFilter").value;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let gender=document.getElementById("genderFilter").value;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let filtered=data.filter(row=&gt;{</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>let p=(product==="All" || row.Product===product);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let g=(gender==="All" || row.Gender===gender);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>return p &amp;&amp; g;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let incomeAvg =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>filtered.reduce((a,b)=&gt;a+Number(b.Income),0)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>/ filtered.length;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let milesAvg =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>filtered.reduce((a,b)=&gt;a+Number(b.Miles),0)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>/ filtered.length;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let fitnessAvg =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>filtered.reduce((a,b)=&gt;a+Number(b.Fitness),0)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>/ filtered.length;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("customers")</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.innerHTML=filtered.length;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("income")</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.innerHTML="₹"+incomeAvg.toFixed(0);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("miles")</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.innerHTML=milesAvg.toFixed(0);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("fitness")</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.innerHTML=fitnessAvg.toFixed(1);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>createPie(filtered);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>createAge(filtered);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>createScatter(filtered);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>createBox(filtered);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function createPie(data){</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let counts={};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>data.forEach(r=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>counts[r.Product]=(counts[r.Product]||0)+1;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>Plotly.newPlot("pie",[{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>labels:Object.keys(counts),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>values:Object.values(counts),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>type:"pie"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}],{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>title:"Product Market Share"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function createAge(data){</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>Plotly.newPlot("age",[{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>x:data.map(x=&gt;x.Age),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>type:"histogram"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}],{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>title:"Age Distribution"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function createScatter(data){</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>Plotly.newPlot("scatter",[{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>x:data.map(x=&gt;x.Usage),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>y:data.map(x=&gt;x.Miles),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>mode:"markers",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>text:data.map(x=&gt;x.Product)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}],{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>title:"Usage vs Miles",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>xaxis:{title:"Usage"},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>yaxis:{title:"Miles"}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function createBox(data){</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let products=[...new Set(data.map(x=&gt;x.Product))];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let traces=products.map(product=&gt;{</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>return{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>y:data</p>
+<p class="p1"><span class="Apple-converted-space">            </span>.filter(x=&gt;x.Product===product)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>.map(x=&gt;x.Income),</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>type:"box",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>name:product</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>Plotly.newPlot("box",traces,{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>title:"Income by Product"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
