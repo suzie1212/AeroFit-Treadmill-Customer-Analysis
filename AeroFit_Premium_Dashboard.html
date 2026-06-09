@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AeroFit Premium Dashboard</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+body{margin:0;font-family:Inter,Arial,sans-serif;background:#0f172a;color:#fff}
+.hero{padding:60px 30px;text-align:center;background:linear-gradient(135deg,#111827,#1e293b)}
+.hero h1{font-size:48px;margin:0}
+.hero p{color:#cbd5e1;max-width:900px;margin:auto}
+.container{padding:25px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.card{background:#1e293b;border-radius:16px;padding:20px}
+.metric{font-size:34px;font-weight:bold}
+.section{margin-top:25px;background:#1e293b;padding:20px;border-radius:16px}
+.chart{height:500px}
+.insights{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px}
+.insight{background:#334155;padding:15px;border-radius:12px}
+select{padding:10px;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="hero">
+<h1>🏃 AeroFit Customer Analytics</h1>
+<p>Interactive business dashboard for customer segmentation, product positioning, purchasing behavior, and fitness trends.</p>
+</div>
+
+<div class="container">
+
+<div class="section">
+<label>Filter Product:</label>
+<select id="product"><option value="All">All Products</option></select>
+</div>
+
+<div class="kpis">
+<div class="card"><div>Total Customers</div><div id="cust" class="metric">-</div></div>
+<div class="card"><div>Avg Income</div><div id="inc" class="metric">-</div></div>
+<div class="card"><div>Avg Miles</div><div id="miles" class="metric">-</div></div>
+<div class="card"><div>Avg Fitness</div><div id="fit" class="metric">-</div></div>
+</div>
+
+<div class="section"><div id="pie" class="chart"></div></div>
+<div class="section"><div id="age" class="chart"></div></div>
+<div class="section"><div id="income" class="chart"></div></div>
+<div class="section"><div id="scatter" class="chart"></div></div>
+
+<div class="section">
+<h2>Business Insights</h2>
+<div class="insights">
+<div class="insight">KP281 targets entry-level fitness enthusiasts.</div>
+<div class="insight">Higher-income customers show stronger preference for premium products.</div>
+<div class="insight">Fitness and usage levels are positively associated with miles logged.</div>
+<div class="insight">Premium products appeal to more performance-oriented customers.</div>
+</div>
+</div>
+
+</div>
+
+<script>
+let raw=[];
+Papa.parse("aerofit_treadmill.csv",{
+download:true,header:true,
+complete:(r)=>{
+raw=r.data.filter(x=>x.Product);
+let products=[...new Set(raw.map(x=>x.Product))];
+products.forEach(p=>{
+document.getElementById("product").innerHTML+=`<option>${p}</option>`;
+});
+document.getElementById("product").onchange=render;
+render();
+}
+});
+
+function render(){
+let prod=document.getElementById("product").value;
+let df=raw.filter(x=>prod==="All"||x.Product===prod);
+
+const avg=c=>df.reduce((a,b)=>a+(+b[c]||0),0)/df.length;
+
+cust.innerText=df.length;
+inc.innerText="₹"+avg("Income").toFixed(0);
+miles.innerText=avg("Miles").toFixed(0);
+fit.innerText=avg("Fitness").toFixed(1);
+
+let counts={};
+df.forEach(r=>counts[r.Product]=(counts[r.Product]||0)+1);
+
+Plotly.newPlot('pie',[{labels:Object.keys(counts),values:Object.values(counts),type:'pie'}],
+{paper_bgcolor:'#1e293b',font:{color:'white'},title:'Product Market Share'});
+
+Plotly.newPlot('age',[{x:df.map(x=>+x.Age),type:'histogram'}],
+{paper_bgcolor:'#1e293b',font:{color:'white'},title:'Age Distribution'});
+
+let products=[...new Set(df.map(x=>x.Product))];
+let traces=products.map(p=>({
+type:'box',
+name:p,
+y:df.filter(x=>x.Product===p).map(x=>+x.Income)
+}));
+
+Plotly.newPlot('income',traces,
+{paper_bgcolor:'#1e293b',font:{color:'white'},title:'Income by Product'});
+
+Plotly.newPlot('scatter',[{
+x:df.map(x=>+x.Usage),
+y:df.map(x=>+x.Miles),
+mode:'markers',
+text:df.map(x=>x.Product)
+}],{
+paper_bgcolor:'#1e293b',
+font:{color:'white'},
+title:'Usage vs Miles'
+});
+}
+</script>
+</body>
+</html>
