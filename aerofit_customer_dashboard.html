@@ -1,0 +1,261 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.dash { padding: 1.25rem 0; }
+.section-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+.metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+.metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 14px 16px; }
+.metric-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.metric-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+.metric-sub { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 1.5rem; }
+.charts-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 1.5rem; }
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+.card-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 1rem; }
+.filter-row { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center; }
+.filter-label { font-size: 12px; color: var(--color-text-secondary); }
+.pill { font-size: 12px; padding: 4px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: 20px; cursor: pointer; background: transparent; color: var(--color-text-secondary); transition: all 0.12s; }
+.pill.active { background: var(--color-background-info); color: var(--color-text-info); border-color: var(--color-border-info); }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 8px; font-size: 12px; color: var(--color-text-secondary); }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.profile-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 13px; }
+.profile-row:last-child { border-bottom: none; }
+.profile-key { color: var(--color-text-secondary); }
+.profile-val { font-weight: 500; color: var(--color-text-primary); }
+.bar-wrap { margin-bottom: 8px; }
+.bar-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 3px; }
+.bar-bg { background: var(--color-background-secondary); border-radius: 3px; height: 7px; }
+.bar-fill { height: 7px; border-radius: 3px; transition: width 0.4s; }
+</style>
+
+<div class="dash">
+  <h2 style="font-size:16px; font-weight:500; color:var(--color-text-primary); margin-bottom:4px;">AeroFit customer analysis</h2>
+  <p style="font-size:13px; color:var(--color-text-secondary); margin-bottom:1.25rem;">180 customers · 3 treadmill models</p>
+
+  <div class="filter-row">
+    <span class="filter-label">Product:</span>
+    <button class="pill active" onclick="setFilter('product','All')">All</button>
+    <button class="pill" onclick="setFilter('product','KP281')">KP281</button>
+    <button class="pill" onclick="setFilter('product','KP481')">KP481</button>
+    <button class="pill" onclick="setFilter('product','KP781')">KP781</button>
+    <span class="filter-label" style="margin-left:8px;">Gender:</span>
+    <button class="pill active" onclick="setFilter('gender','All')">All</button>
+    <button class="pill" onclick="setFilter('gender','Male')">Male</button>
+    <button class="pill" onclick="setFilter('gender','Female')">Female</button>
+  </div>
+
+  <div class="metric-grid" id="metrics"></div>
+
+  <div class="charts-row">
+    <div class="card">
+      <div class="card-title">Product share</div>
+      <div class="legend" id="prod-legend"></div>
+      <div style="position:relative;height:200px;"><canvas id="prodChart" role="img" aria-label="Doughnut chart of product share by model"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Age distribution by product</div>
+      <div class="legend" id="age-legend"></div>
+      <div style="position:relative;height:200px;"><canvas id="ageChart" role="img" aria-label="Bar chart of age distribution"></canvas></div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="card">
+      <div class="card-title">Income vs miles (scatter)</div>
+      <div class="legend" id="scatter-legend"></div>
+      <div style="position:relative;height:220px;"><canvas id="scatterChart" role="img" aria-label="Scatter plot of income vs miles per week"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Usage frequency distribution</div>
+      <div style="position:relative;height:220px;"><canvas id="usageChart" role="img" aria-label="Bar chart of usage frequency"></canvas></div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="card">
+      <div class="card-title">Gender split by product</div>
+      <div style="position:relative;height:200px;"><canvas id="genderChart" role="img" aria-label="Stacked bar chart of gender by product"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Fitness level distribution</div>
+      <div style="position:relative;height:200px;"><canvas id="fitnessChart" role="img" aria-label="Bar chart of fitness levels"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:1.5rem;">
+    <div class="card-title">Product profiles</div>
+    <div id="profiles"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const RAW = [{"Product":"KP281","Age":18,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":3,"Fitness":4,"Income":29562,"Miles":112},{"Product":"KP281","Age":19,"Gender":"Male","Education":15,"MaritalStatus":"Single","Usage":2,"Fitness":3,"Income":31836,"Miles":75},{"Product":"KP281","Age":19,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":4,"Fitness":3,"Income":30699,"Miles":66},{"Product":"KP281","Age":19,"Gender":"Male","Education":12,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":32973,"Miles":85},{"Product":"KP281","Age":20,"Gender":"Male","Education":13,"MaritalStatus":"Partnered","Usage":4,"Fitness":2,"Income":35247,"Miles":47},{"Product":"KP281","Age":20,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":32973,"Miles":66},{"Product":"KP281","Age":21,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":35247,"Miles":75},{"Product":"KP281","Age":21,"Gender":"Male","Education":13,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":32973,"Miles":85},{"Product":"KP281","Age":21,"Gender":"Male","Education":15,"MaritalStatus":"Single","Usage":5,"Fitness":4,"Income":35247,"Miles":141},{"Product":"KP281","Age":21,"Gender":"Female","Education":15,"MaritalStatus":"Partnered","Usage":2,"Fitness":3,"Income":37521,"Miles":85},{"Product":"KP281","Age":22,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":36384,"Miles":85},{"Product":"KP281","Age":22,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":3,"Fitness":2,"Income":35247,"Miles":66},{"Product":"KP281","Age":22,"Gender":"Female","Education":16,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":36384,"Miles":75},{"Product":"KP281","Age":22,"Gender":"Female","Education":14,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":35247,"Miles":75},{"Product":"KP281","Age":23,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":1,"Income":38658,"Miles":47},{"Product":"KP281","Age":23,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":40932,"Miles":75},{"Product":"KP281","Age":23,"Gender":"Female","Education":14,"MaritalStatus":"Single","Usage":2,"Fitness":3,"Income":34110,"Miles":103},{"Product":"KP281","Age":23,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":3,"Income":39795,"Miles":94},{"Product":"KP281","Age":23,"Gender":"Female","Education":16,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":38658,"Miles":113},{"Product":"KP281","Age":23,"Gender":"Female","Education":15,"MaritalStatus":"Partnered","Usage":2,"Fitness":2,"Income":34110,"Miles":38},{"Product":"KP281","Age":23,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":38658,"Miles":113},{"Product":"KP281","Age":23,"Gender":"Male","Education":16,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":40932,"Miles":94},{"Product":"KP281","Age":24,"Gender":"Female","Education":16,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":42069,"Miles":94},{"Product":"KP281","Age":24,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":5,"Fitness":5,"Income":44343,"Miles":188},{"Product":"KP281","Age":24,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":2,"Fitness":3,"Income":45480,"Miles":113},{"Product":"KP281","Age":24,"Gender":"Male","Education":13,"MaritalStatus":"Partnered","Usage":3,"Fitness":2,"Income":42069,"Miles":47},{"Product":"KP281","Age":24,"Gender":"Female","Education":16,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":46617,"Miles":75},{"Product":"KP281","Age":25,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":48891,"Miles":75},{"Product":"KP281","Age":25,"Gender":"Male","Education":14,"MaritalStatus":"Partnered","Usage":2,"Fitness":3,"Income":45480,"Miles":56},{"Product":"KP281","Age":25,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":2,"Fitness":2,"Income":53439,"Miles":47},{"Product":"KP281","Age":25,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":39795,"Miles":85},{"Product":"KP281","Age":25,"Gender":"Male","Education":16,"MaritalStatus":"Single","Usage":3,"Fitness":4,"Income":40932,"Miles":113},{"Product":"KP281","Age":25,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":2,"Fitness":2,"Income":40932,"Miles":47},{"Product":"KP281","Age":25,"Gender":"Male","Education":16,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":43206,"Miles":85},{"Product":"KP281","Age":26,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":3,"Fitness":4,"Income":44343,"Miles":113},{"Product":"KP281","Age":26,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":3,"Income":52302,"Miles":113},{"Product":"KP281","Age":26,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":2,"Fitness":2,"Income":53439,"Miles":47},{"Product":"KP281","Age":26,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":51165,"Miles":85},{"Product":"KP281","Age":26,"Gender":"Female","Education":16,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":36384,"Miles":66},{"Product":"KP281","Age":26,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":4,"Income":44343,"Miles":132},{"Product":"KP281","Age":26,"Gender":"Male","Education":16,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":50028,"Miles":85},{"Product":"KP281","Age":27,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":3,"Fitness":2,"Income":45480,"Miles":66},{"Product":"KP281","Age":27,"Gender":"Male","Education":16,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":54576,"Miles":85},{"Product":"KP281","Age":27,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":2,"Fitness":3,"Income":45480,"Miles":56},{"Product":"KP281","Age":28,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":2,"Fitness":3,"Income":46617,"Miles":56},{"Product":"KP281","Age":28,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":2,"Fitness":3,"Income":52302,"Miles":66},{"Product":"KP281","Age":28,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":52302,"Miles":103},{"Product":"KP281","Age":28,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":54576,"Miles":94},{"Product":"KP281","Age":28,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":54576,"Miles":113},{"Product":"KP281","Age":28,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":51165,"Miles":56},{"Product":"KP281","Age":29,"Gender":"Male","Education":18,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":68220,"Miles":85},{"Product":"KP281","Age":29,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":2,"Fitness":2,"Income":46617,"Miles":38},{"Product":"KP281","Age":29,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":3,"Income":50028,"Miles":94},{"Product":"KP281","Age":30,"Gender":"Male","Education":14,"MaritalStatus":"Partnered","Usage":4,"Fitness":4,"Income":46617,"Miles":141},{"Product":"KP281","Age":30,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":54576,"Miles":85},{"Product":"KP281","Age":31,"Gender":"Male","Education":14,"MaritalStatus":"Partnered","Usage":2,"Fitness":2,"Income":54576,"Miles":47},{"Product":"KP281","Age":31,"Gender":"Female","Education":14,"MaritalStatus":"Single","Usage":2,"Fitness":2,"Income":45480,"Miles":47},{"Product":"KP281","Age":32,"Gender":"Female","Education":14,"MaritalStatus":"Single","Usage":3,"Fitness":4,"Income":46617,"Miles":113},{"Product":"KP281","Age":32,"Gender":"Male","Education":14,"MaritalStatus":"Partnered","Usage":4,"Fitness":3,"Income":52302,"Miles":85},{"Product":"KP281","Age":33,"Gender":"Female","Education":16,"MaritalStatus":"Single","Usage":2,"Fitness":2,"Income":55713,"Miles":38},{"Product":"KP281","Age":33,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":46617,"Miles":85},{"Product":"KP281","Age":34,"Gender":"Male","Education":16,"MaritalStatus":"Single","Usage":4,"Fitness":5,"Income":51165,"Miles":169},{"Product":"KP281","Age":34,"Gender":"Female","Education":16,"MaritalStatus":"Single","Usage":2,"Fitness":2,"Income":52302,"Miles":66},{"Product":"KP281","Age":35,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":3,"Income":48891,"Miles":85},{"Product":"KP281","Age":35,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":60261,"Miles":94},{"Product":"KP281","Age":35,"Gender":"Female","Education":18,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":67083,"Miles":85},{"Product":"KP281","Age":36,"Gender":"Male","Education":12,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":44343,"Miles":94},{"Product":"KP281","Age":37,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":37521,"Miles":85},{"Product":"KP281","Age":38,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":46617,"Miles":75},{"Product":"KP281","Age":38,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":2,"Fitness":3,"Income":54576,"Miles":56},{"Product":"KP281","Age":38,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":2,"Fitness":3,"Income":52302,"Miles":56},{"Product":"KP281","Age":38,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":56850,"Miles":75},{"Product":"KP281","Age":39,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":4,"Income":59124,"Miles":132},{"Product":"KP281","Age":40,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":61398,"Miles":66},{"Product":"KP281","Age":41,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":3,"Income":54576,"Miles":103},{"Product":"KP281","Age":43,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":53439,"Miles":66},{"Product":"KP281","Age":44,"Gender":"Female","Education":16,"MaritalStatus":"Single","Usage":3,"Fitness":4,"Income":57987,"Miles":75},{"Product":"KP281","Age":46,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":2,"Income":60261,"Miles":47},{"Product":"KP281","Age":47,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":3,"Income":56850,"Miles":94},{"Product":"KP281","Age":50,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":64809,"Miles":66},{"Product":"KP481","Age":19,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":31836,"Miles":64},{"Product":"KP481","Age":20,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":2,"Fitness":3,"Income":32973,"Miles":53},{"Product":"KP481","Age":20,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":34110,"Miles":106},{"Product":"KP481","Age":20,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":38658,"Miles":95},{"Product":"KP481","Age":21,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":5,"Fitness":4,"Income":34110,"Miles":212},{"Product":"KP481","Age":21,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":2,"Fitness":2,"Income":34110,"Miles":42},{"Product":"KP481","Age":21,"Gender":"Male","Education":12,"MaritalStatus":"Partnered","Usage":2,"Fitness":2,"Income":32973,"Miles":53},{"Product":"KP481","Age":23,"Gender":"Male","Education":14,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":36384,"Miles":95},{"Product":"KP481","Age":23,"Gender":"Male","Education":14,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":38658,"Miles":85},{"Product":"KP481","Age":23,"Gender":"Female","Education":16,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":45480,"Miles":95},{"Product":"KP481","Age":23,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":3,"Income":45480,"Miles":127},{"Product":"KP481","Age":23,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":2,"Income":43206,"Miles":74},{"Product":"KP481","Age":23,"Gender":"Female","Education":14,"MaritalStatus":"Single","Usage":3,"Fitness":2,"Income":40932,"Miles":53},{"Product":"KP481","Age":23,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":45480,"Miles":64},{"Product":"KP481","Age":24,"Gender":"Female","Education":14,"MaritalStatus":"Single","Usage":3,"Fitness":2,"Income":40932,"Miles":85},{"Product":"KP481","Age":24,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":3,"Fitness":4,"Income":48891,"Miles":106},{"Product":"KP481","Age":24,"Gender":"Female","Education":16,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":50028,"Miles":106},{"Product":"KP481","Age":25,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":2,"Fitness":3,"Income":45480,"Miles":85},{"Product":"KP481","Age":25,"Gender":"Female","Education":14,"MaritalStatus":"Single","Usage":3,"Fitness":4,"Income":43206,"Miles":127},{"Product":"KP481","Age":25,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":2,"Fitness":2,"Income":52302,"Miles":42},{"Product":"KP481","Age":25,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":5,"Fitness":3,"Income":47754,"Miles":106},{"Product":"KP481","Age":25,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":45480,"Miles":95},{"Product":"KP481","Age":25,"Gender":"Female","Education":14,"MaritalStatus":"Single","Usage":2,"Fitness":3,"Income":43206,"Miles":64},{"Product":"KP481","Age":25,"Gender":"Male","Education":14,"MaritalStatus":"Partnered","Usage":4,"Fitness":3,"Income":45480,"Miles":170},{"Product":"KP481","Age":25,"Gender":"Male","Education":14,"MaritalStatus":"Partnered","Usage":3,"Fitness":4,"Income":43206,"Miles":106},{"Product":"KP481","Age":25,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":2,"Fitness":3,"Income":50028,"Miles":53},{"Product":"KP481","Age":25,"Gender":"Female","Education":14,"MaritalStatus":"Single","Usage":2,"Fitness":2,"Income":45480,"Miles":42},{"Product":"KP481","Age":25,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":48891,"Miles":127},{"Product":"KP481","Age":26,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":3,"Income":45480,"Miles":85},{"Product":"KP481","Age":26,"Gender":"Female","Education":16,"MaritalStatus":"Single","Usage":4,"Fitness":4,"Income":50028,"Miles":127},{"Product":"KP481","Age":26,"Gender":"Male","Education":16,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":51165,"Miles":106},{"Product":"KP481","Age":27,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":4,"Fitness":2,"Income":45480,"Miles":53},{"Product":"KP481","Age":29,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":51165,"Miles":95},{"Product":"KP481","Age":30,"Gender":"Female","Education":14,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":57987,"Miles":74},{"Product":"KP481","Age":30,"Gender":"Female","Education":13,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":46617,"Miles":106},{"Product":"KP481","Age":31,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":52302,"Miles":95},{"Product":"KP481","Age":31,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":2,"Fitness":3,"Income":51165,"Miles":64},{"Product":"KP481","Age":31,"Gender":"Female","Education":18,"MaritalStatus":"Single","Usage":2,"Fitness":1,"Income":65220,"Miles":21},{"Product":"KP481","Age":32,"Gender":"Male","Education":16,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":60261,"Miles":127},{"Product":"KP481","Age":32,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":53439,"Miles":95},{"Product":"KP481","Age":33,"Gender":"Male","Education":13,"MaritalStatus":"Partnered","Usage":4,"Fitness":4,"Income":53439,"Miles":170},{"Product":"KP481","Age":33,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":2,"Fitness":3,"Income":50028,"Miles":85},{"Product":"KP481","Age":33,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":51165,"Miles":95},{"Product":"KP481","Age":33,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":5,"Fitness":3,"Income":53439,"Miles":95},{"Product":"KP481","Age":33,"Gender":"Female","Education":18,"MaritalStatus":"Single","Usage":3,"Fitness":4,"Income":47754,"Miles":74},{"Product":"KP481","Age":34,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":3,"Income":64809,"Miles":95},{"Product":"KP481","Age":34,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":4,"Income":59124,"Miles":85},{"Product":"KP481","Age":34,"Gender":"Male","Education":15,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":67083,"Miles":85},{"Product":"KP481","Age":35,"Gender":"Female","Education":14,"MaritalStatus":"Partnered","Usage":3,"Fitness":2,"Income":52302,"Miles":53},{"Product":"KP481","Age":35,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":2,"Income":53439,"Miles":53},{"Product":"KP481","Age":35,"Gender":"Female","Education":16,"MaritalStatus":"Single","Usage":3,"Fitness":2,"Income":50028,"Miles":64},{"Product":"KP481","Age":35,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":53439,"Miles":95},{"Product":"KP481","Age":37,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":2,"Fitness":3,"Income":48891,"Miles":85},{"Product":"KP481","Age":38,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":3,"Income":62535,"Miles":85},{"Product":"KP481","Age":38,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":59124,"Miles":106},{"Product":"KP481","Age":40,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":61398,"Miles":85},{"Product":"KP481","Age":40,"Gender":"Female","Education":16,"MaritalStatus":"Single","Usage":3,"Fitness":3,"Income":57987,"Miles":85},{"Product":"KP481","Age":40,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":3,"Fitness":3,"Income":64809,"Miles":95},{"Product":"KP481","Age":45,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":2,"Fitness":2,"Income":54576,"Miles":42},{"Product":"KP481","Age":48,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":2,"Fitness":3,"Income":57987,"Miles":64},{"Product":"KP781","Age":22,"Gender":"Male","Education":14,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":48658,"Miles":106},{"Product":"KP781","Age":22,"Gender":"Male","Education":16,"MaritalStatus":"Single","Usage":3,"Fitness":5,"Income":54781,"Miles":120},{"Product":"KP781","Age":22,"Gender":"Male","Education":18,"MaritalStatus":"Single","Usage":4,"Fitness":5,"Income":48556,"Miles":200},{"Product":"KP781","Age":23,"Gender":"Male","Education":16,"MaritalStatus":"Single","Usage":4,"Fitness":5,"Income":58516,"Miles":140},{"Product":"KP781","Age":23,"Gender":"Female","Education":18,"MaritalStatus":"Single","Usage":5,"Fitness":4,"Income":53536,"Miles":100},{"Product":"KP781","Age":23,"Gender":"Male","Education":16,"MaritalStatus":"Single","Usage":4,"Fitness":5,"Income":48556,"Miles":100},{"Product":"KP781","Age":24,"Gender":"Male","Education":16,"MaritalStatus":"Single","Usage":4,"Fitness":5,"Income":61006,"Miles":100},{"Product":"KP781","Age":24,"Gender":"Male","Education":18,"MaritalStatus":"Partnered","Usage":4,"Fitness":5,"Income":57271,"Miles":80},{"Product":"KP781","Age":24,"Gender":"Female","Education":16,"MaritalStatus":"Single","Usage":5,"Fitness":5,"Income":52291,"Miles":200},{"Product":"KP781","Age":24,"Gender":"Male","Education":16,"MaritalStatus":"Single","Usage":5,"Fitness":5,"Income":49801,"Miles":160},{"Product":"KP781","Age":25,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":5,"Income":49801,"Miles":120},{"Product":"KP781","Age":25,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":4,"Income":62251,"Miles":160},{"Product":"KP781","Age":25,"Gender":"Female","Education":18,"MaritalStatus":"Partnered","Usage":5,"Fitness":5,"Income":61006,"Miles":200},{"Product":"KP781","Age":25,"Gender":"Male","Education":18,"MaritalStatus":"Partnered","Usage":4,"Fitness":3,"Income":64741,"Miles":100},{"Product":"KP781","Age":25,"Gender":"Male","Education":18,"MaritalStatus":"Partnered","Usage":6,"Fitness":4,"Income":70966,"Miles":180},{"Product":"KP781","Age":25,"Gender":"Male","Education":18,"MaritalStatus":"Partnered","Usage":6,"Fitness":5,"Income":75946,"Miles":240},{"Product":"KP781","Age":25,"Gender":"Male","Education":20,"MaritalStatus":"Partnered","Usage":4,"Fitness":5,"Income":74701,"Miles":170},{"Product":"KP781","Age":26,"Gender":"Female","Education":21,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":69721,"Miles":100},{"Product":"KP781","Age":26,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":5,"Fitness":4,"Income":64741,"Miles":180},{"Product":"KP781","Age":27,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":5,"Income":83416,"Miles":160},{"Product":"KP781","Age":27,"Gender":"Male","Education":18,"MaritalStatus":"Single","Usage":4,"Fitness":3,"Income":88396,"Miles":100},{"Product":"KP781","Age":27,"Gender":"Male","Education":21,"MaritalStatus":"Partnered","Usage":4,"Fitness":4,"Income":90886,"Miles":100},{"Product":"KP781","Age":28,"Gender":"Female","Education":18,"MaritalStatus":"Partnered","Usage":6,"Fitness":5,"Income":92131,"Miles":180},{"Product":"KP781","Age":28,"Gender":"Male","Education":18,"MaritalStatus":"Partnered","Usage":7,"Fitness":5,"Income":77191,"Miles":180},{"Product":"KP781","Age":28,"Gender":"Male","Education":18,"MaritalStatus":"Single","Usage":6,"Fitness":5,"Income":88396,"Miles":150},{"Product":"KP781","Age":29,"Gender":"Male","Education":18,"MaritalStatus":"Single","Usage":5,"Fitness":5,"Income":52290,"Miles":180},{"Product":"KP781","Age":29,"Gender":"Male","Education":14,"MaritalStatus":"Partnered","Usage":7,"Fitness":5,"Income":85906,"Miles":300},{"Product":"KP781","Age":30,"Gender":"Female","Education":16,"MaritalStatus":"Partnered","Usage":6,"Fitness":5,"Income":90886,"Miles":280},{"Product":"KP781","Age":30,"Gender":"Male","Education":18,"MaritalStatus":"Partnered","Usage":5,"Fitness":4,"Income":103336,"Miles":160},{"Product":"KP781","Age":30,"Gender":"Male","Education":18,"MaritalStatus":"Partnered","Usage":5,"Fitness":5,"Income":99601,"Miles":150},{"Product":"KP781","Age":31,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":6,"Fitness":5,"Income":89641,"Miles":260},{"Product":"KP781","Age":33,"Gender":"Female","Education":18,"MaritalStatus":"Partnered","Usage":4,"Fitness":5,"Income":95866,"Miles":200},{"Product":"KP781","Age":34,"Gender":"Male","Education":16,"MaritalStatus":"Single","Usage":5,"Fitness":5,"Income":92131,"Miles":150},{"Product":"KP781","Age":35,"Gender":"Male","Education":16,"MaritalStatus":"Partnered","Usage":4,"Fitness":5,"Income":92131,"Miles":360},{"Product":"KP781","Age":38,"Gender":"Male","Education":18,"MaritalStatus":"Partnered","Usage":5,"Fitness":5,"Income":104581,"Miles":150},{"Product":"KP781","Age":40,"Gender":"Male","Education":21,"MaritalStatus":"Single","Usage":6,"Fitness":5,"Income":83416,"Miles":200},{"Product":"KP781","Age":42,"Gender":"Male","Education":18,"MaritalStatus":"Single","Usage":5,"Fitness":4,"Income":89641,"Miles":200},{"Product":"KP781","Age":45,"Gender":"Male","Education":16,"MaritalStatus":"Single","Usage":5,"Fitness":5,"Income":90886,"Miles":160},{"Product":"KP781","Age":47,"Gender":"Male","Education":18,"MaritalStatus":"Partnered","Usage":4,"Fitness":5,"Income":104581,"Miles":120},{"Product":"KP781","Age":48,"Gender":"Male","Education":18,"MaritalStatus":"Partnered","Usage":4,"Fitness":5,"Income":95508,"Miles":180}];
+
+const COLORS = { KP281: '#378ADD', KP481: '#1D9E75', KP781: '#D85A30' };
+const state = { product: 'All', gender: 'All' };
+let charts = {};
+
+function filtered() {
+  return RAW.filter(r =>
+    (state.product === 'All' || r.Product === state.product) &&
+    (state.gender === 'All' || r.Gender === state.gender)
+  );
+}
+
+function avg(arr, key) {
+  if (!arr.length) return 0;
+  return arr.reduce((s,r) => s + r[key], 0) / arr.length;
+}
+
+function setFilter(type, val) {
+  state[type] = val;
+  document.querySelectorAll(`.pill`).forEach(b => {
+    const t = b.getAttribute('onclick');
+    if (t && t.includes(`'${type}'`)) b.classList.toggle('active', t.includes(`'${val}'`));
+  });
+  render();
+}
+
+function render() {
+  const data = filtered();
+  renderMetrics(data);
+  renderProdChart(data);
+  renderAgeChart(data);
+  renderScatter(data);
+  renderUsage(data);
+  renderGender(data);
+  renderFitness(data);
+  renderProfiles(data);
+}
+
+function renderMetrics(data) {
+  const el = document.getElementById('metrics');
+  if (!data.length) { el.innerHTML = '<p style="color:var(--color-text-secondary);font-size:13px;">No data for selection.</p>'; return; }
+  const maleP = Math.round(data.filter(r=>r.Gender==='Male').length/data.length*100);
+  el.innerHTML = `
+    <div class="metric"><div class="metric-label">Customers</div><div class="metric-value">${data.length}</div></div>
+    <div class="metric"><div class="metric-label">Avg age</div><div class="metric-value">${avg(data,'Age').toFixed(1)}</div></div>
+    <div class="metric"><div class="metric-label">Avg income</div><div class="metric-value">$${Math.round(avg(data,'Income')/1000)}k</div></div>
+    <div class="metric"><div class="metric-label">Avg miles/wk</div><div class="metric-value">${Math.round(avg(data,'Miles'))}</div><div class="metric-sub">${maleP}% male</div></div>
+  `;
+}
+
+function makeOrUpdate(id, config) {
+  if (charts[id]) { charts[id].destroy(); }
+  const ctx = document.getElementById(id);
+  if (ctx) charts[id] = new Chart(ctx, config);
+}
+
+function renderProdChart(data) {
+  const counts = { KP281: 0, KP481: 0, KP781: 0 };
+  data.forEach(r => counts[r.Product]++);
+  const labels = Object.keys(counts);
+  const vals = Object.values(counts);
+  const total = vals.reduce((a,b)=>a+b,0);
+  const el = document.getElementById('prod-legend');
+  el.innerHTML = labels.map((l,i) => `<span class="legend-item"><span class="legend-dot" style="background:${Object.values(COLORS)[i]}"></span>${l} ${total?Math.round(vals[i]/total*100):0}%</span>`).join('');
+  makeOrUpdate('prodChart', {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: vals, backgroundColor: Object.values(COLORS), borderWidth: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '60%' }
+  });
+}
+
+function renderAgeChart(data) {
+  const bins = ['18-24','25-29','30-34','35-39','40+'];
+  const getBin = age => age<=24?0:age<=29?1:age<=34?2:age<=39?3:4;
+  const prods = ['KP281','KP481','KP781'];
+  const counts = prods.map(() => Array(5).fill(0));
+  data.forEach(r => { const bi = prods.indexOf(r.Product); if(bi>=0) counts[bi][getBin(r.Age)]++; });
+  const el = document.getElementById('age-legend');
+  el.innerHTML = prods.map((p,i) => `<span class="legend-item"><span class="legend-dot" style="background:${COLORS[p]}"></span>${p}</span>`).join('');
+  makeOrUpdate('ageChart', {
+    type: 'bar',
+    data: { labels: bins, datasets: prods.map((p,i) => ({ label: p, data: counts[i], backgroundColor: COLORS[p] })) },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { stacked: true, ticks: { font: { size: 11 } } }, y: { stacked: true, ticks: { font: { size: 11 } } } } }
+  });
+}
+
+function renderScatter(data) {
+  const prods = ['KP281','KP481','KP781'];
+  const el = document.getElementById('scatter-legend');
+  el.innerHTML = prods.map(p => `<span class="legend-item"><span class="legend-dot" style="background:${COLORS[p]}"></span>${p}</span>`).join('');
+  const datasets = prods.map(p => ({
+    label: p,
+    data: data.filter(r=>r.Product===p).map(r=>({x:r.Income, y:r.Miles})),
+    backgroundColor: COLORS[p] + 'aa', pointRadius: 4, pointHoverRadius: 6
+  }));
+  makeOrUpdate('scatterChart', {
+    type: 'scatter',
+    data: { datasets },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: {
+        x: { title: { display: true, text: 'Income ($)', font: { size: 11 } }, ticks: { callback: v => '$'+Math.round(v/1000)+'k', font: { size: 10 } } },
+        y: { title: { display: true, text: 'Miles/wk', font: { size: 11 } }, ticks: { font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+function renderUsage(data) {
+  const counts = {};
+  data.forEach(r => { counts[r.Usage] = (counts[r.Usage]||0)+1; });
+  const labels = Object.keys(counts).sort((a,b)=>+a-+b);
+  makeOrUpdate('usageChart', {
+    type: 'bar',
+    data: { labels: labels.map(l=>'×'+l+'/wk'), datasets: [{ label: 'Customers', data: labels.map(l=>counts[l]), backgroundColor: '#378ADD' }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { font: { size: 11 } } }, y: { ticks: { font: { size: 11 } } } } }
+  });
+}
+
+function renderGender(data) {
+  const prods = ['KP281','KP481','KP781'];
+  const male = prods.map(p => data.filter(r=>r.Product===p&&r.Gender==='Male').length);
+  const female = prods.map(p => data.filter(r=>r.Product===p&&r.Gender==='Female').length);
+  makeOrUpdate('genderChart', {
+    type: 'bar',
+    data: { labels: prods, datasets: [
+      { label: 'Male', data: male, backgroundColor: '#378ADD' },
+      { label: 'Female', data: female, backgroundColor: '#D4537E' }
+    ]},
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { font: { size: 11 }, boxWidth: 10 } } }, scales: { x: { stacked: true, ticks: { font: { size: 11 } } }, y: { stacked: true, ticks: { font: { size: 11 } } } } }
+  });
+}
+
+function renderFitness(data) {
+  const counts = [1,2,3,4,5].map(f => data.filter(r=>r.Fitness===f).length);
+  makeOrUpdate('fitnessChart', {
+    type: 'bar',
+    data: { labels: ['1 (low)','2','3','4','5 (high)'], datasets: [{ data: counts, backgroundColor: ['#F09595','#FAC775','#5DCAA5','#85B7EB','#378ADD'] }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { font: { size: 11 } } }, y: { ticks: { font: { size: 11 } } } } }
+  });
+}
+
+function renderProfiles(data) {
+  const prods = ['KP281','KP481','KP781'];
+  const el = document.getElementById('profiles');
+  el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">` +
+    prods.map(p => {
+      const d = data.filter(r=>r.Product===p);
+      if (!d.length) return `<div style="padding:12px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);"><p style="font-size:13px;font-weight:500;color:var(--color-text-primary);">${p}</p><p style="font-size:12px;color:var(--color-text-secondary);">No data</p></div>`;
+      const maleP = Math.round(d.filter(r=>r.Gender==='Male').length/d.length*100);
+      const partneredP = Math.round(d.filter(r=>r.MaritalStatus==='Partnered').length/d.length*100);
+      const color = COLORS[p];
+      return `<div style="padding:12px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);">
+        <p style="font-size:13px;font-weight:500;color:${color};margin-bottom:8px;">${p} <span style="font-size:11px;color:var(--color-text-secondary);font-weight:400;">${d.length} customers</span></p>
+        <div class="profile-row"><span class="profile-key">Avg age</span><span class="profile-val">${avg(d,'Age').toFixed(1)}</span></div>
+        <div class="profile-row"><span class="profile-key">Avg income</span><span class="profile-val">$${Math.round(avg(d,'Income')/1000)}k</span></div>
+        <div class="profile-row"><span class="profile-key">Avg miles/wk</span><span class="profile-val">${Math.round(avg(d,'Miles'))}</span></div>
+        <div class="profile-row"><span class="profile-key">Avg fitness</span><span class="profile-val">${avg(d,'Fitness').toFixed(1)}/5</span></div>
+        <div class="profile-row"><span class="profile-key">Male</span><span class="profile-val">${maleP}%</span></div>
+        <div class="profile-row"><span class="profile-key">Partnered</span><span class="profile-val">${partneredP}%</span></div>
+      </div>`;
+    }).join('') + `</div>`;
+}
+
+render();
+</script>
